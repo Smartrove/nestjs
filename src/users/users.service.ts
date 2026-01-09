@@ -26,7 +26,7 @@ export class UsersService {
     });
   }
 
-  async login(loginDTO: LoginUserDTO) {
+  async login(loginDTO: LoginUserDTO): Promise<{ accessToken: string }> {
     //check if user exist
     const user = await this.prisma.user.findFirst({
       where: {
@@ -38,10 +38,31 @@ export class UsersService {
       throw new UnauthorizedException();
     }
     //decrypt user password for match
+    const isMatched = await this.decryptPassword(
+      loginDTO.password,
+      user.password,
+    );
+
+    if (!isMatched) {
+      throw new UnauthorizedException('Invalid Password');
+    }
+
+    const accessToken = await this.jwtService.signAsync(
+      {
+        email: user.email,
+        id: user.id,
+      },
+      { expiresIn: '7d' },
+    );
+
+    return { accessToken };
   }
 
   async hashpassword(plainText: string): Promise<string> {
     const salt = await bcrypt.genSalt(10);
     return bcrypt.hash(plainText, salt);
+  }
+  async decryptPassword(plainText: string, hash: string) {
+    return await bcrypt.compare(plainText, hash);
   }
 }
