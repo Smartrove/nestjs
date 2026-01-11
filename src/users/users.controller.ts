@@ -1,7 +1,17 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { CreateUserDTO } from './create-user-dto';
 import { UsersService } from './users.service';
 import { LoginUserDTO } from './login-user.dto';
+import { AuthGuard } from './auth.guard';
+import { Roles } from 'src/roles/roles.decorator';
+import { Role } from 'src/roles/roles.enum';
 
 @Controller('users')
 export class UsersController {
@@ -19,5 +29,12 @@ export class UsersController {
     loginUserDTO: LoginUserDTO,
   ) {
     return await this.usersService.login(loginUserDTO);
+  }
+
+  @UseGuards(AuthGuard)
+  @Roles(Role.User)
+  @Get('/user-profile')
+  async getUserProfile(@Request() req) {
+    return req.user;
   }
 }
