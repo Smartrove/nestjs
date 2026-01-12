@@ -4,6 +4,8 @@ import { UsersService } from './users.service';
 import { PrismaService } from 'src/prisma.service';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from 'src/roles/roles.guard';
 
 @Module({
   imports: [
@@ -14,6 +16,13 @@ import { jwtConstants } from './constants';
     }),
   ],
   controllers: [UsersController],
-  providers: [UsersService, PrismaService],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+    UsersService,
+    PrismaService,
+  ],
 })
 export class UsersModule {}

@@ -6,8 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
-  engineType = "client"
 }
 
 datasource db {
@@ -15,10 +13,10 @@ datasource db {
 }
 
 enum Role {
-  USER
-  ADMIN
-  SUB_ADMIN
-  SUPER_ADMIN
+  user
+  admin
+  subAdmin
+  superAdmin
 }
 
 model User {
@@ -29,5 +27,5 @@ model User {
   password  String
   blocked Boolean? 
   createdAt DateTime  @default(now())
-  role Role @default(USER)
+  role Role @default(user)
 }
